@@ -1,0 +1,91 @@
+#! /usr/bin/gawk -f
+#
+# Construct environmental features that will be used to predict subjective complaints 
+#
+# usage: ./construct_features.awk
+#
+# dependencies:
+# weather_data.csv
+#
+# notes:
+#
+# Weather:
+# FG = fog
+# TS = thunder
+# PL = ice pellets, sleet, snow pellets or small hail
+# GR = hail
+# GL = glaze or rime
+# DU = dust, volcanic ash, blowing dust, blowing sand, or blowing obstruction
+# HZ = smoke or haze
+# BLSN = blowing or drifting snow
+# FC = tornado, water spout, or funnel cloud
+# WIND = high or damaging winds
+# BLPY = blowing spray
+# BR = mist
+# DZ = drizzle
+# FZDZ = freezing drizzle
+# RA = rain
+# FZRA = freezing rain
+# SN = snow, snow pellets, snow grains, or ice crystals
+# UP = unknown precipitation
+# MIFG = ground fog
+# FZFG = ice fog or freezing fog
+#
+# Conclusion: Any weather is bad weather
+#
+# Sky Conditions:
+# CLR = clear sky
+# FEW = few clouds
+# SCT = scattered clouds
+# BKN = broken clouds
+# OVC = overcast
+# VV = obscured sky
+# 10 = partially obscured sky
+
+BEGIN {
+
+    FS = ","
+    OFS = ","
+    file = "/home/iradinsky/project/weather_data.csv"
+    DATE = 6
+    HOURLYSkyConditions = 8
+    DAILYMaxTemp = 27
+    DAILYMinTemp = 28
+    DAILYAvgTemp = 29
+    DAILYSunrise = 36
+    DAILYSunset = 37
+    DAILYWeather = 38
+
+     while ( (getline < file) > 0 ) {
+	 if ($DATE ~ /[0-9]+/) {
+	 # extract dmy from date-time
+	 match($DATE, /([0-9]{4}-[0-9]{2}-[0-9]{2})/, dmy)
+	 date = dmy[1]
+
+	 if ($DAILYAvgTemp && ! weather[date]["avg_temp"] ) 
+	     weather[date]["avg_temp"] = $DAILYAvgTemp
+
+	 # calculate daylight hours
+	 daylight_hours = $DAILYSunset - $DAILYSunrise
+
+	 if ( ! weather[date]["daylight_hours"] ) 
+	     weather[date]["daylight_hours"] = daylight_hours
+
+	 # add whether or not there was bad weather that day
+	 if ($DAILYWeather && ! weather[date]["bad_weather"] ) 
+	     weather[date]["bad_weather"] = 1
+
+	 if ($HOURLYSkyConditions ~ /(OVC|VV|10)/)
+	     weather[date]["hours_overcast"]++
+	 }
+     }
+
+     for (d in weather) {
+	 if (! weather[d]["bad_weather"] ) weather[d]["bad_weather"] = 0
+	 if (! weather[d]["hours_overcast"] ) weather[d]["hours_overcast"] = 0
+	
+	 print d, weather[d]["avg_temp"], weather[d]["daylight_hours"], weather[d]["bad_weather"], weather[d]["hours_overcast"]
+     }
+
+    if ( close(file) > 0 ) print "Error closing file: " file > "/dev/stderr"
+}

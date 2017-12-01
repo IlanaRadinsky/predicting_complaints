@@ -1,0 +1,7 @@
+#! /usr/bin/R
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(glmnet)
+
+df <- read.csv("/home/iradinsky/project/final_noise.csv", header=TRUE)
