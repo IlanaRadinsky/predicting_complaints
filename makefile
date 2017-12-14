@@ -1,5 +1,8 @@
 all: final.csv final_noise.csv
 
+clean:
+	rm features.csv complaints_by_date.csv perc_noise_by_date.csv final.csv final_noise.csv
+
 311_Service_Requests.csv.gz:
 	wget -O - 'https://data.cityofnewyork.us/api/views/erm2-nwe9/rows.csv?accessType=DOWNLOAD' | gzip > 311_Service_Requests.csv.gz &
 
@@ -15,7 +18,7 @@ complaints_by_date.csv: 311_Service_Requests.csv.gz count_complaints_by_date.awk
 	./count_complaints_by_date.awk | sort >> complaints_by_date.csv
 
 perc_noise_by_date.csv: 311_Service_Requests.csv.gz compute_perc_noise_by_date.awk
-	echo "date,perc_noise_complaints" > perc_noise_by_date.csv
+	echo "date,noise_complaints,other_complaints,total" > perc_noise_by_date.csv
 	./compute_perc_noise_by_date.awk | sort >> perc_noise_by_date.csv
 
 final.csv: features.csv complaints_by_date.csv

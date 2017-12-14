@@ -40,8 +40,8 @@ BEGIN {
 		if (c ~ /NOISE/) noise_complaints += complaints[d][c]
 	}
 
-	perc_complaints = noise_complaints/total
-	print d, perc_complaints
+	other_complaints = total - noise_complaints
+	print d, noise_complaints, other_complaints, total
     }
 
     if (close(cmd)) print "Error closing command " cmd > "/dev/stderr"

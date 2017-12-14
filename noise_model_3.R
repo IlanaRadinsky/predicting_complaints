@@ -44,7 +44,7 @@ mse.ols.train <- mean((y_hat_train - train$perc_noise_complaints)^2)
 mse.ols.test <- mean((y_hat_test - test$perc_noise_complaints)^2)
 
 ## LASSO
-lasso <- cv.glmnet(X_train, y_train, alpha = 1, family="binomial")
+lasso <- cv.glmnet(X_train, y=as.factor(y_train), alpha = 1, family="binomial")
 y_hat_train <- predict(lasso, newx = X_train, s="lambda.min", type="response")
 y_hat_test <- predict(lasso, newx = X_test, s="lambda.min", type="response")
 
