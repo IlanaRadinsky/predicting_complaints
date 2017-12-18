@@ -1,11 +1,12 @@
 Next steps:
 * Is there a way to take all this model-stats stuff (with figures, etc.) and put it into a function
   so that I can just input different models with different features and interactions and stuff and
-  have it automatically generate the stats and plots and stuff for me?
+  have it automatically generate the stats and plots and stuff for me? DONE
 * Add more features
     -> traffic
     -> gloomy for the past three days
     -> Yankees/Mets win/lose
-    -> ***day of the week***
+    -> ***day of the week*** DONE
+* Add DOW feature and see how it affects model!
 
 We don't care about the actual number of noise complaints - we care about the percent of complaints on any given day that are noise complaints. => # noise / # complaints => probability, on any given day, that a complaint is a noise complaint. So maybe, this would be better suited as a logistic regression problem?

@@ -1,8 +1,0 @@
-./count_complaints_by_date.awk | sort > complaints_by_date.csv
-touch final.csv
-./count_complaints_by_date.awk | sort > complaints_by_date.csv
-touch final.csv
-./count_complaints_by_date.awk | sort > complaints_by_date.csv
-touch final.csv
-./count_complaints_by_date.awk | sort > complaints_by_date.csv
-touch final.csv
