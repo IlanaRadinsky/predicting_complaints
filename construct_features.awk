@@ -42,6 +42,33 @@
 # VV = obscured sky
 # 10 = partially obscured sky
 
+# round.awk --- do normal rounding
+# https://www.gnu.org/software/gawk/manual/html_node/Round-Function.html
+function round(x,   ival, aval, fraction)
+{
+    ival = int(x)    # integer part, int() truncates
+
+    # see if fractional part
+    if (ival == x)   # no fraction
+	return ival   # ensure no decimals
+
+    if (x < 0) {
+	aval = -x     # absolute value
+        ival = int(aval)
+	fraction = aval - ival
+	if (fraction >= .5)
+	    return int(x) - 1   # -2.5 --> -3
+	else
+	    return int(x)       # -2.3 --> -2
+    } else {
+	fraction = x - ival
+        if (fraction >= .5)
+	    return ival + 1
+	else
+	    return ival
+    }
+}
+
 BEGIN {
 
     FS = ","
@@ -66,7 +93,12 @@ BEGIN {
 	     weather[date]["avg_temp"] = $DAILYAvgTemp
 
 	 # calculate daylight hours
-	 daylight_hours = $DAILYSunset - $DAILYSunrise
+	 # date must be in format YYYY MM DD HH MM S
+	 newDate = date
+	 gsub(/-/, " ", newDate)
+	 sunset = mktime(newDate " " substr($DAILYSunset,1,2) " " substr($DAILYSunset,3,2) " 0")
+	 sunrise = mktime(newDate " " substr($DAILYSunrise,1,2) " " substr($DAILYSunrise,3,2) " 0")
+	 daylight_hours = round((sunset-sunrise)/(60*60))
 
 	 if ( ! weather[date]["daylight_hours"] ) 
 	     weather[date]["daylight_hours"] = daylight_hours
@@ -75,16 +107,23 @@ BEGIN {
 	 if ($DAILYWeather && ! weather[date]["bad_weather"] ) 
 	     weather[date]["bad_weather"] = 1
 
+	 match($DATE, /([0-9]{2}):[0-9]{2}/, time)
+	 hour = time[1]
+	 
 	 if ($HOURLYSkyConditions ~ /(OVC|VV|10)/)
-	     weather[date]["hours_overcast"]++
+	     weather[date]["hours_overcast"][hour] = 1
 	 }
      }
 
      for (d in weather) {
 	 if (! weather[d]["bad_weather"] ) weather[d]["bad_weather"] = 0
-	 if (! weather[d]["hours_overcast"] ) weather[d]["hours_overcast"] = 0
-	
-	 print d, weather[d]["avg_temp"], weather[d]["daylight_hours"], weather[d]["bad_weather"], weather[d]["hours_overcast"]
+
+	 weather[d]["hours_overcast"]["total"] = 0
+	 for (h in weather[d]["hours_overcast"]) {
+	     if (! (h ~ "total")) weather[d]["hours_overcast"]["total"]++
+	 }
+	 
+	 print d, weather[d]["avg_temp"], weather[d]["daylight_hours"], weather[d]["bad_weather"], weather[d]["hours_overcast"]["total"]
      }
 
     if ( close(file) > 0 ) print "Error closing file: " file > "/dev/stderr"

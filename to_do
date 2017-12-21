@@ -9,4 +9,10 @@ Next steps:
     -> ***day of the week*** DONE
 * Add DOW feature and see how it affects model!
 
+* To ask Prof. Broder:
+    -> does he know of where i can find data on yankees/mets, traffic data that students have used in
+       the past?
+    -> we can use python and awk scripts?
+
+* Daylight hours, hours overcast both look wrong
 We don't care about the actual number of noise complaints - we care about the percent of complaints on any given day that are noise complaints. => # noise / # complaints => probability, on any given day, that a complaint is a noise complaint. So maybe, this would be better suited as a logistic regression problem?

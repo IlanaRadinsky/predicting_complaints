@@ -24,7 +24,7 @@ BEGIN {
 	# extract date from date-time
 	match($CREATED_DATE, /([0-9]{2})\/([0-9]{2})\/([0-9]{4})/, mdy)
 
-	# convert date from MM/DD/YYYY to YYYY-MM-DD to match weather_data.csv
+        # convert date from MM/DD/YYYY to YYYY-MM-DD to match weather_data.csv
 	date = mdy[3] "-" mdy[1] "-" mdy[2]
 
 	complaints[date][toupper($COMPLAINT_TYPE)]++
@@ -38,10 +38,10 @@ BEGIN {
 	    
 	    for (c in complaints[d])
 		if (c ~ /NOISE/) noise_complaints += complaints[d][c]
-	}
 
-	other_complaints = total - noise_complaints
-	print d, noise_complaints, other_complaints, total
+	    other_complaints = total - noise_complaints
+	    print d, noise_complaints, other_complaints, total
+	}
     }
 
     if (close(cmd)) print "Error closing command " cmd > "/dev/stderr"
