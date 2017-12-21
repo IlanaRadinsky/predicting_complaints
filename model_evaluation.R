@@ -1,4 +1,4 @@
-create_and_evaluate_model <- function(X_train, y_train) {
+evaluate_model <- function(X_train, y_train, model1) {
     library(dplyr)
     library(tidyr)
     library(ggplot2)
@@ -7,8 +7,8 @@ create_and_evaluate_model <- function(X_train, y_train) {
     library(boot)
     library(scales)
 
-    model1 <- cv.glmnet(X_train, y_train, family="binomial")
-    coef(model1, s="lambda.min")
+    #model1 <- cv.glmnet(X_train, y_train, family="binomial")
+    #coef(model1, s="lambda.min")
 
     predictions_model1 <- data.frame(y_train) %>%
         merge(data.frame(predict(model1, X_train, type="response", s="lambda.min")), by="row.names")

@@ -4,15 +4,12 @@ Next steps:
   have it automatically generate the stats and plots and stuff for me? DONE
 * Add more features
     -> traffic
-    -> gloomy for the past three days
+    -> gloomy for the past three days DONE
     -> Yankees/Mets win/lose
     -> ***day of the week*** DONE
-* Add DOW feature and see how it affects model!
+* Add DOW feature and see how it affects model! DONE
+* Modify R function to test model on TEST data DONE
+* Download baseball data and add it in. (Is it worth it to go through all that scraping to construct a feature that I'm pretty sure won't be useful?)
+* Add comments to all scripts to make them more clear and explain purpose
 
-* To ask Prof. Broder:
-    -> does he know of where i can find data on yankees/mets, traffic data that students have used in
-       the past?
-    -> we can use python and awk scripts?
-
-* Daylight hours, hours overcast both look wrong
 We don't care about the actual number of noise complaints - we care about the percent of complaints on any given day that are noise complaints. => # noise / # complaints => probability, on any given day, that a complaint is a noise complaint. So maybe, this would be better suited as a logistic regression problem?
