@@ -1,1 +1,3 @@
-*311_Service_Requests.csv.gz
+data/
+311_Service_Requests.csv.gz
+weather_data.csv
