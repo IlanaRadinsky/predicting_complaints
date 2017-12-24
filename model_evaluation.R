@@ -1,4 +1,4 @@
-evaluate_model <- function(X_train, y_train, model1) {
+evaluate_model <- function(X, y, model) {
     library(dplyr)
     library(tidyr)
     library(ggplot2)
@@ -7,38 +7,33 @@ evaluate_model <- function(X_train, y_train, model1) {
     library(boot)
     library(scales)
 
-    #model1 <- cv.glmnet(X_train, y_train, family="binomial")
-    #coef(model1, s="lambda.min")
-
-    predictions_model1 <- data.frame(y_train) %>%
-        merge(data.frame(predict(model1, X_train, type="response", s="lambda.min")), by="row.names")
-    colnames(predictions_model1) <- c("Row.names", "other", "noise", "pred")
-    predictions_model1 <- predictions_model1 %>%
+    predictions_model <- data.frame(y) %>%
+        merge(data.frame(predict(model, X, type="response", s="lambda.min")), by="row.names")
+    colnames(predictions_model) <- c("Row.names", "other", "noise", "pred")
+    predictions_model <- predictions_model %>%
         mutate(actual = (noise)/(noise+other))
-    head(predictions_model1)
+    head(predictions_model)
 
-    mse <- mean((predictions_model1$pred - predictions_model1$actual)^2)
+    # Mean squared error
+    mse <- mean((predictions_model$pred - predictions_model$actual)^2)
     mse
 
     ## Distribution of predictions
     distribution_of_predictions <-
-        predictions_model1 %>%
+        predictions_model %>%
         ggplot(aes(x=pred)) +
         geom_histogram()
 
     ## Distribution of actual ratios
     distribution_of_actuals <-
-        predictions_model1 %>%
+        predictions_model %>%
         ggplot(aes(x=actual)) +
         geom_histogram()
 
-    summary(predictions_model1)
-    ## pred ranges from 0.083 to 0.168 with median 0.143
-    ## actual ranges from 0.01945 to 0.57731 with median 0.12037
-
+    thresh = 0.18
     model_1_stats <-
-        predictions_model1 %>%
-        mutate(total=noise+other, num_correct=noise*(pred>=0.12)+other*(pred<0.12))
+        predictions_model %>%
+        mutate(total=noise+other, num_correct=noise*(pred>=thresh)+other*(pred<thresh))
 
     accuracy <-
         model_1_stats %>%
@@ -48,23 +43,23 @@ evaluate_model <- function(X_train, y_train, model1) {
 
     precision <-
         model_1_stats %>%
-        filter(pred>=0.12) %>%
+        filter(pred>=thresh) %>%
         summarise(prec=sum(noise)/sum(total))
     precision
 
     tpr <-
         model_1_stats %>%
-        summarise(tpr=sum(noise*(pred>=0.12))/sum(noise))
+        summarise(tpr=sum(noise*(pred>=thresh))/sum(noise))
     tpr
 
     fpr <-
         model_1_stats %>%
-        summarise(fpr=sum(other*(pred>=0.12))/sum(other))
+        summarise(fpr=sum(other*(pred>=thresh))/sum(other))
     fpr
 
     auc <-
         model_1_stats %>%
-        summarise(auc=mean(pred>=0.12))
+        summarise(auc=mean(pred>=thresh))
     auc
 
     ## ROC curve
@@ -72,11 +67,11 @@ evaluate_model <- function(X_train, y_train, model1) {
     colnames(roc_data_1) <- c("tpr", "fpr")
 
     for (i in 1:1000) {
-        thresh = i/1000
+        t = i/1000
         temp <-
             model_1_stats %>%
-            summarise(tpr=sum(noise*(pred>=thresh))/sum(noise),
-                      fpr=sum(other*(pred>=thresh))/sum(other))
+            summarise(tpr=sum(noise*(pred>=t))/sum(noise),
+                      fpr=sum(other*(pred>=t))/sum(other))
 
         roc_data_1[i, 'tpr'] <- temp[1,1]
         roc_data_1[i, 'fpr'] <- temp[1,2]
@@ -92,17 +87,17 @@ evaluate_model <- function(X_train, y_train, model1) {
     ## Calibration plot
     calibration_plot <-
         model_1_stats %>%
-        #group_by(predicted=round(pred*10000)/10000) %>%
-        #summarise(num=sum(total), actual=sum(noise)/sum(total)) %>%
-        ggplot(aes(x=pred, y=actual)) +
+        group_by(predicted=round(pred*10^8)/10^8) %>%
+        summarise(num=sum(total), actual=sum(noise)/sum(total)) %>%
+        ggplot(aes(x=predicted, y=actual, size=num)) +
         geom_point() +
         geom_abline(linetype=2) +
         scale_x_continuous(labels=percent, lim=c(0.05,0.25)) +
         scale_y_continuous(labels=percent, lim=c(0,0.65)) +
-        #scale_size_continuous(labels=comma) +
-        labs(title='Calibration plot for Model 1',
-             x = 'Predicted ratio of noise complaints/total',
-             y = 'Actual ratio of noise complaints/total',
+        scale_size_continuous(labels=comma) +
+        labs(title='Calibration plot for Logistic Regression Model',
+             x = 'Predicted ratio of # noise complaints/# total complaints',
+             y = 'Actual ratio of # noise complaints/# total complaints',
              size = 'Number of days')
 
     ## How accurate are we?
@@ -123,8 +118,8 @@ evaluate_model <- function(X_train, y_train, model1) {
         geom_abline(linetype='dashed', color='red') +
         geom_abline(linetype='dashed', slope=(1/b[1,1]), intercept=0, color='blue')
 
-    return(list("model"=model1,
-                "df_with_predictions"=predictions_model1,
+    return(list("model"=model,
+                "df_with_predictions"=predictions_model,
                 "mse"=mse,
                 "distribution_of_actuals"=distribution_of_actuals,
                 "distribution_of_predictions"=distribution_of_predictions,

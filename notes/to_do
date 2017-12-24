@@ -1,0 +1,26 @@
+Next steps:
+* Write up summary page of conclusions
+    -> use precision, accuracy, fpr, tpr, auc
+    -> reference calibration plot
+    -> use coefficients to say what is correlated vs. what is not correlated
+    -> explain how noise complaints are a proxy for subjective complaints
+    
+Future work:
+* Add more features
+    -> traffic
+    -> Yankees/Mets win/lose (requires scraping)
+    -> other environmental features?
+* See if there are similar trends for other "subjective" compaints (graffiti, etc.)
+
+Completed:
+* Is there a way to take all this model-stats stuff (with figures, etc.) and put it into a function
+  so that I can just input different models with different features and interactions and stuff and
+  have it automatically generate the stats and plots and stuff for me? DONE
+* Add more features
+    -> gloomy for the past three days DONE
+    -> ***day of the week*** DONE
+* Add DOW feature and see how it affects model! DONE
+* Modify R function to test model on TEST data DONE
+* Add comments to all scripts to make them more clear and explain purpose DONE
+
+We don't care about the actual number of noise complaints - we care about the percent of complaints on any given day that are noise complaints. => # noise / # complaints => probability, on any given day, that a complaint is a noise complaint. So maybe, this would be better suited as a logistic regression problem?

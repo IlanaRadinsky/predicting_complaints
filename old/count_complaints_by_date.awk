@@ -1,0 +1,44 @@
+#! /usr/bin/gawk -f
+#
+# Count the number of complaints per day, total and by complaint type.
+#
+# usage: gawk -f count_complaints_by_date.awk
+#
+# dependencies:
+# 311_Service_Requests.csv.gz
+#
+
+BEGIN {
+
+    FS = ","
+    OFS = ","
+
+    file = "311_Service_Requests.csv.gz"
+    cmd = "zcat " file
+
+    CREATED_DATE = 2
+    COMPLAINT_TYPE = 6
+
+    while ( (cmd|getline) > 0){
+
+	# extract date from date-time
+	match($CREATED_DATE, /([0-9]{2})\/([0-9]{2})\/([0-9]{4})/, mdy)
+
+	# convert date from MM/DD/YYYY to YYYY-MM-DD to match weather_data.csv
+	date = mdy[3] "-" mdy[1] "-" mdy[2]
+
+	# sum up total number of complaints per complaint type and overall
+	complaints[date][toupper($COMPLAINT_TYPE)]++
+	complaints[date]["total"]++
+    }
+
+    # print complaint type with count to stdout
+    for (d in complaints) {
+	if (d ~ /[0-9]+/)
+	    for (c in complaints[d])
+		print d, c, complaints[d][c]
+    }
+
+    if (close(cmd)) print "Error closing command " cmd > "/dev/stderr"
+
+}

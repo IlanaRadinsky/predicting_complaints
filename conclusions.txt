@@ -1,5 +1,0 @@
-* people complain more during the summer (when its hot out and when there are
-  more daylight hours) AND on the weekends (Friday/Saturday)
-* insignificant features:
-  - all the gloominess features
-  - bad weather
