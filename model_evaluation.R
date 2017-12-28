@@ -22,13 +22,39 @@ evaluate_model <- function(X, y, model) {
     distribution_of_predictions <-
         predictions_model %>%
         ggplot(aes(x=pred)) +
-        geom_histogram()
+        geom_histogram() +
+        scale_x_continuous(labels=percent) +
+        scale_y_continuous(labels=percent) +
+        labs(title="Distribution of Predicted Ratios of # Noise Complaints / Total # Complaints",
+             x="Predicted ratio of noise/total",
+             y="# of Days")
 
     ## Distribution of actual ratios
     distribution_of_actuals <-
         predictions_model %>%
         ggplot(aes(x=actual)) +
-        geom_histogram()
+        geom_histogram() +
+        scale_x_continuous(labels=percent) +
+        scale_y_continuous(labels=percent) +
+        labs(title="Distribution of Actual Ratios of # Noise Complaints / Total # Complaints",
+             x="Predicted ratio of noise/total",
+             y="# of Days")
+
+    ## Combined distributions
+    combined_distributions <-
+        predictions_model %>%
+        ggplot() +
+        geom_histogram(aes(x=actual, fill="r"), alpha=0.5) +
+        geom_histogram(aes(x=pred, fill="b"), alpha=0.5) +
+        scale_x_continuous(labels=percent) +
+        scale_y_continuous(labels=comma) +
+        scale_colour_manual(name="", values=c("r"="red", "b"="blue"), labels=c("b"="Predicted", "r"="Actual")) +
+        scale_fill_manual(name="", values=c("r"="red", "b"="blue"), labels=c("b"="Predicted", "r"="Actual")) +
+        labs(title="Distribution of Predicted vs. Actual Ratios of # Noise Complaints / Total # Complaints",
+             x="Ratio of noise/total",
+             y="# of Days")
+
+        
 
     thresh = 0.18
     model_1_stats <-
@@ -123,6 +149,7 @@ evaluate_model <- function(X, y, model) {
                 "mse"=mse,
                 "distribution_of_actuals"=distribution_of_actuals,
                 "distribution_of_predictions"=distribution_of_predictions,
+                "combined_distributions"=combined_distributions,
                 "model_stats"=model_1_stats,
                 "accuracy"=accuracy,
                 "precision"=precision,

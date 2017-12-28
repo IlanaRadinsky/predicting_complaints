@@ -124,7 +124,7 @@ X_test_2 <- model.matrix(~ avg_temp*day_of_week + daylight_hours + bad_weather +
 results_test2 <- evaluate_model(X_test_2, y_test, model2)
 summary(results_test2)
 
-## MODEL 3
+## MODEL 3 - best one!
 ## Train
 X_train_3 <- model.matrix(~ avg_temp*day_of_week*daylight_hours + bad_weather + gloomy_today + gloomy_past_two_days + gloomy_past_three_days, data=train)
 
@@ -142,4 +142,8 @@ summary(results_test3)
 
 pdf("final_plot_2.pdf")
 results_train3$calibration_plot
+dev.off()
+
+pdf("final_plot_3.pdf")
+results_train3$combined_distributions
 dev.off()
